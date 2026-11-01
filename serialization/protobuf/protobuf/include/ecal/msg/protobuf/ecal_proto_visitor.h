@@ -58,7 +58,7 @@ namespace eCAL
     class MessageVisitor
     {
       friend class CProtoDecoder;
-    public:я пытаюсб разобраться в твоих изменениях. в этом фалй почему ты убрал проверку версии 
+    public:
       virtual ~MessageVisitor() {};
 
     protected:

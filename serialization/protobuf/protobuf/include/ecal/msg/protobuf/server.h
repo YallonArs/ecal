@@ -136,7 +136,7 @@ namespace eCAL
         if (!service_)
           throw std::runtime_error("CServiceServer: Null service instance.");
 
-        return service_->GetDescriptor()->full_name();
+        return ToString(service_->GetDescriptor()->full_name());
       }
 
       /**
@@ -154,12 +154,12 @@ namespace eCAL
         for (int i = 0; i < service_descriptor->method_count(); ++i)
         {
           const google::protobuf::MethodDescriptor* method_descriptor = service_descriptor->method(i);
-          std::string method_name = method_descriptor->name();
+          std::string method_name = ToString(method_descriptor->name());
           m_methods[method_name] = method_descriptor;
 
           std::string input_type_desc, output_type_desc;
-          dyn_decoder.GetServiceMessageDescFromType(service_descriptor, method_descriptor->input_type()->name(), input_type_desc, error_s);
-          dyn_decoder.GetServiceMessageDescFromType(service_descriptor, method_descriptor->output_type()->name(), output_type_desc, error_s);
+          dyn_decoder.GetServiceMessageDescFromType(service_descriptor, ToString(method_descriptor->input_type()->name()), input_type_desc, error_s);
+          dyn_decoder.GetServiceMessageDescFromType(service_descriptor, ToString(method_descriptor->output_type()->name()), output_type_desc, error_s);
 
           SServiceMethodInformation method_info{
             method_name,

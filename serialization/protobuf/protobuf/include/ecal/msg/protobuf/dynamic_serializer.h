@@ -25,6 +25,7 @@
 #pragma once
 
 #include <ecal/msg/exception.h>
+#include <ecal/msg/protobuf/ecal_proto_compat.h>
 #include <ecal/msg/protobuf/ecal_proto_dyn.h>
 
 #include <map>
@@ -106,11 +107,7 @@ namespace eCAL
         std::string Deserialize(const void* buffer_, size_t size_, const DatatypeInformation& datatype_info_)
         {
           google::protobuf::util::JsonPrintOptions options;
-#if GOOGLE_PROTOBUF_VERSION >= 5026000
           options.always_print_fields_with_no_presence = true;
-#else
-          options.always_print_primitive_fields = true;
-#endif
 
           std::string binary_input;
           binary_input.assign(static_cast<const char*>(buffer_), static_cast<size_t>(size_));

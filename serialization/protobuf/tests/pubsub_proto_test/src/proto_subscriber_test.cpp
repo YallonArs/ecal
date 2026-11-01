@@ -56,11 +56,7 @@ public:
 
   size_t GetPersonSize()
   {
-#if GOOGLE_PROTOBUF_VERSION >= 3001000
-    return static_cast<size_t>(p.ByteSizeLong());
-#else
-    return static_cast<size_t>(p.ByteSize());
-#endif
+  return static_cast<size_t>(p.ByteSizeLong());
   }
 
   void OnPerson()

@@ -215,13 +215,17 @@ namespace protobuf
               if (accept_complete_array || visitor->AcceptMessage(child_message_name + "[" + std::to_string(fnum) + "]"))
               {
                 info.id = fnum;
-                visitor->ArrayValueEnum(info, ref_ptr->GetRepeatedEnum(msg_, field, fnum)->number(), ref_ptr->GetRepeatedEnum(msg_, field, fnum)->name());
+                const int enum_value = ref_ptr->GetRepeatedEnumValue(msg_, field, fnum);
+                const google::protobuf::EnumValueDescriptor* enum_descriptor = field->enum_type()->FindValueByNumber(enum_value);
+                visitor->ArrayValueEnum(info, enum_value, enum_descriptor == nullptr ? "" : ToString(enum_descriptor->name()));
               }
             }
           }
           else
           {
-            visitor->ScalarValueEnum({field->name(), complete_message_name, field->number(), field->type_name() }, ref_ptr->GetEnum(msg_, field)->number(), ref_ptr->GetEnum(msg_, field)->name());
+            const int enum_value = ref_ptr->GetEnumValue(msg_, field);
+            const google::protobuf::EnumValueDescriptor* enum_descriptor = field->enum_type()->FindValueByNumber(enum_value);
+            visitor->ScalarValueEnum({field->name(), complete_message_name, field->number(), field->type_name() }, enum_value, enum_descriptor == nullptr ? "" : ToString(enum_descriptor->name()));
           }
           break;
         case google::protobuf::FieldDescriptor::CPPTYPE_STRING:     // TYPE_STRING, TYPE_BYTES
@@ -286,7 +290,7 @@ namespace protobuf
             msg.GetReflection()->ListFields(msg, &msg_fields);
 
             if (prefix_.find(field->name()) == std::string::npos || !msg_fields.empty())
-              ProcProtoMsg(msg, field->name(), complete_message_name, false, field->number());
+              ProcProtoMsg(msg, ToString(field->name()), complete_message_name, false, field->number());
           }
         }
         break;

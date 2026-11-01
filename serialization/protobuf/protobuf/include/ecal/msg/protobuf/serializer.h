@@ -26,6 +26,7 @@
 
 #include <cstddef>
 #include <ecal/msg/exception.h>
+#include <ecal/msg/protobuf/ecal_proto_compat.h>
 #include <ecal/msg/protobuf/ecal_proto_hlp.h>
 
 namespace eCAL
@@ -44,7 +45,7 @@ namespace eCAL
             DatatypeInformation info{};
             T msg{};
             info.encoding = "proto";
-            info.name = msg.GetTypeName();
+            info.name = protobuf::GetProtoMessageTypeName(msg);
             info.descriptor = protobuf::GetProtoMessageDescription(msg);
             return info;
           }();
@@ -61,11 +62,7 @@ namespace eCAL
 
         static size_t MessageSize(const T& msg_)
         {
-#if GOOGLE_PROTOBUF_VERSION >= 3001000
           size_t size = static_cast<size_t>(msg_.ByteSizeLong());
-#else
-          size_t size = static_cast<size_t>(msg_.ByteSize());
-#endif
           return(size);
         }
 

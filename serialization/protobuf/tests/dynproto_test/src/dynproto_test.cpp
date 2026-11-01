@@ -273,12 +273,14 @@ void ProcProtoMsg(const google::protobuf::Message& msg_, const std::string& pref
           int fsize = ref_ptr->FieldSize(msg_, field);
           for(int fnum = 0; fnum < fsize; ++fnum)
           {
-            ProcProtoType(prefix_, field->name(), ref_ptr->GetRepeatedEnum(msg_, field, fnum), fnum);
+            const int enum_value = ref_ptr->GetRepeatedEnumValue(msg_, field, fnum);
+            ProcProtoType(prefix_, std::string(field->name()), field->enum_type()->FindValueByNumber(enum_value), fnum);
           }
         }
         else
         {
-          ProcProtoType(prefix_, field->name(), ref_ptr->GetEnum(msg_, field), 0);
+          const int enum_value = ref_ptr->GetEnumValue(msg_, field);
+          ProcProtoType(prefix_, std::string(field->name()), field->enum_type()->FindValueByNumber(enum_value), 0);
         }
         break;
       case google::protobuf::FieldDescriptor::CPPTYPE_STRING:     // TYPE_STRING, TYPE_BYTES

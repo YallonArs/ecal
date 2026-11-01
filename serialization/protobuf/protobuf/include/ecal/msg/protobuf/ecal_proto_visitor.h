@@ -18,6 +18,7 @@
 */
 
 #include <string>
+#include <string_view>
 
 #ifdef _MSC_VER
 #pragma warning(push, 0) // disable proto warnings
@@ -45,12 +46,19 @@ namespace eCAL
       std::string group_name;
       int id;
       std::string type;
+
+      MessageInfo(std::string_view field_name_, std::string_view group_name_, int id_, std::string_view type_)
+        : field_name(field_name_)
+        , group_name(group_name_)
+        , id(id_)
+        , type(type_)
+      {}
     };
 
     class MessageVisitor
     {
       friend class CProtoDecoder;
-    public:
+    public:я пытаюсб разобраться в твоих изменениях. в этом фалй почему ты убрал проверку версии 
       virtual ~MessageVisitor() {};
 
     protected:

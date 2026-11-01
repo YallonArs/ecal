@@ -25,6 +25,7 @@
 
 #include <algorithm>
 #include <string>
+#include <string_view>
 #include <vector>
 
 // protobuf includes
@@ -41,7 +42,12 @@ namespace eCAL
 {
 namespace protobuf
 {
-  inline std::string CreateCompleteMessageName(const std::string& name_, const std::string& prefix_)
+  inline std::string ToString(std::string_view value_)
+  {
+    return std::string(value_);
+  }
+
+  inline std::string CreateCompleteMessageName(std::string_view name_, std::string_view prefix_)
   {
     std::string message_name;
     if (!prefix_.empty())
@@ -58,7 +64,7 @@ namespace protobuf
     return element_.substr(0, element_.find('.'));
   }
 
-  inline bool HasFile(const google::protobuf::FileDescriptorSet& fset_, const std::string& fname_)
+  inline bool HasFile(const google::protobuf::FileDescriptorSet& fset_, std::string_view fname_)
   {
     for (auto findex = 0; findex < fset_.file_size(); ++findex)
     {
@@ -140,7 +146,7 @@ namespace protobuf
 
   inline std::string GetProtoMessageTypeName(const google::protobuf::Message& msg_)
   {
-    return msg_.GetTypeName();
+    return ToString(msg_.GetTypeName());
   }
 
   inline std::vector<std::string> GetProtoMessageFieldNames(const std::vector<const google::protobuf::FieldDescriptor*>& fields_)
@@ -149,7 +155,7 @@ namespace protobuf
     std::transform(fields_.begin(), fields_.end(), std::back_inserter(names_vec), 
       [](const google::protobuf::FieldDescriptor* field) 
     {
-      return field->name();
+      return ToString(field->name());
     }
     );
     return names_vec;
@@ -162,7 +168,7 @@ namespace protobuf
     for (int i = 0; i < count; ++i)
     {
       auto field = descriptor->field(i);
-      names_vec.push_back(field->name());
+      names_vec.push_back(ToString(field->name()));
     }
     return names_vec;
   }

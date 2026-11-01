@@ -21,6 +21,9 @@
 ##########################
 
 find_package(Protobuf REQUIRED)
+
+set(ECAL_PROTOBUF_CXX_STANDARD cxx_std_17)
+
 ecal_add_library(protobuf_base)
 add_library(eCAL::protobuf_base ALIAS protobuf_base)
 
@@ -31,6 +34,7 @@ target_sources(protobuf_base
     BASE_DIRS include
     FILES
       include/ecal/msg/protobuf/dynamic_serializer.h
+      include/ecal/msg/protobuf/ecal_proto_compat.h
       include/ecal/msg/protobuf/ecal_proto_decoder.h
       include/ecal/msg/protobuf/ecal_proto_dyn.h
       include/ecal/msg/protobuf/ecal_proto_hlp.h
@@ -48,7 +52,7 @@ target_sources(protobuf_base
 
 target_link_libraries(protobuf_base PUBLIC protobuf::libprotobuf)
 
-target_compile_features(protobuf_base PUBLIC cxx_std_14)
+target_compile_features(protobuf_base PUBLIC ${ECAL_PROTOBUF_CXX_STANDARD})
 
 install(
   TARGETS protobuf_base
@@ -87,6 +91,7 @@ target_sources(protobuf_core
       include/ecal/msg/protobuf/client_untyped_instance.h
       include/ecal/msg/protobuf/dynamic_json_subscriber.h
       include/ecal/msg/protobuf/dynamic_subscriber.h
+      include/ecal/msg/protobuf/ecal_proto_compat.h
       include/ecal/msg/protobuf/ecal_proto_decoder.h
       include/ecal/msg/protobuf/ecal_proto_dyn.h
       include/ecal/msg/protobuf/ecal_proto_hlp.h
@@ -98,7 +103,7 @@ target_sources(protobuf_core
       include/ecal/msg/protobuf/subscriber.h
 )
 
-target_compile_features(protobuf_core INTERFACE cxx_std_14)
+target_compile_features(protobuf_core INTERFACE ${ECAL_PROTOBUF_CXX_STANDARD})
 
 install(
   TARGETS protobuf_core
@@ -132,7 +137,7 @@ if(ECAL_USE_HDF5)
         include/ecal/msg/protobuf/omeasurement.h
   )
 
-  target_compile_features(protobuf_measurement INTERFACE cxx_std_14)
+  target_compile_features(protobuf_measurement INTERFACE ${ECAL_PROTOBUF_CXX_STANDARD})
 
   install(
     TARGETS protobuf_measurement

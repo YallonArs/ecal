@@ -31,6 +31,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <string_view>
 
 using google::protobuf::Descriptor;
 using google::protobuf::EnumDescriptor;
@@ -41,8 +42,12 @@ using google::protobuf::compiler::GeneratorContext;
 
 namespace {
 
-  std::string header_name_for_proto(const std::string& proto_name) {
-    std::string out = proto_name;
+  std::string to_string(std::string_view value) {
+    return std::string(value);
+  }
+
+  std::string header_name_for_proto(std::string_view proto_name) {
+    std::string out(proto_name);
     if (out.size() >= 6 && out.substr(out.size() - 6) == ".proto")
       out.replace(out.size() - 6, 6, ".pbftags.h");
     else
@@ -56,15 +61,6 @@ namespace {
     }
     if (!id.empty() && std::isdigit(static_cast<unsigned char>(id[0]))) id.insert(id.begin(), '_');
     return id;
-  }
-
-  std::string label_to_string(FieldDescriptor::Label label) {
-    switch (label) {
-    case FieldDescriptor::LABEL_REQUIRED: return "required";
-    case FieldDescriptor::LABEL_REPEATED: return "repeated";
-    case FieldDescriptor::LABEL_OPTIONAL:
-    default: return "optional";
-    }
   }
 
   std::string field_kind(const FieldDescriptor* f) {
@@ -92,9 +88,9 @@ namespace {
   }
 
   std::string enumerator_name(const FieldDescriptor* f) {
-    std::string label = label_to_string(f->label());
+    std::string label = f->is_repeated() ? "repeated" : "optional";
     std::string type = field_kind(f);
-    std::string name = f->name(); // already lower_snake in proto
+    std::string name = to_string(f->name()); // already lower_snake in proto
     return sanitize_identifier(label + "_" + type + "_" + name);
   }
 
@@ -102,7 +98,7 @@ namespace {
   std::string flattened_msg(const Descriptor* d) {
     std::string s;
     for (const auto* cur = d; cur != nullptr; cur = cur->containing_type()) {
-      std::string part = sanitize_identifier(cur->name());
+      std::string part = sanitize_identifier(to_string(cur->name()));
       s = s.empty() ? part : (part + "_" + s);
     }
     return s;
@@ -110,10 +106,10 @@ namespace {
 
   // Flatten nested enum path: Outer_Inner_EnumName
   std::string flattened_enum(const EnumDescriptor* e) {
-    std::string s = sanitize_identifier(e->name());
+    std::string s = sanitize_identifier(to_string(e->name()));
     const Descriptor* parent = e->containing_type();
     while (parent) {
-      s = sanitize_identifier(parent->name()) + "_" + s;
+      s = sanitize_identifier(to_string(parent->name())) + "_" + s;
       parent = parent->containing_type();
     }
     return s;
@@ -161,7 +157,7 @@ namespace {
     os << "enum class " << name << " : std::int32_t {\n";
     for (int i = 0; i < e->value_count(); ++i) {
       const auto* v = e->value(i);
-      os << "    " << sanitize_identifier(v->name()) << " = " << v->number();
+      os << "    " << sanitize_identifier(to_string(v->name())) << " = " << v->number();
       os << (i + 1 < e->value_count() ? ",\n" : "\n");
     }
     os << "};\n\n";
@@ -222,11 +218,12 @@ public:
     body << "#include <cstdint>\n";
     body << "\n";
 
-    if (!file->package().empty()) open_namespaces(body, file->package());
+    const std::string package_name = to_string(file->package());
+    if (!package_name.empty()) open_namespaces(body, package_name);
 
     walk_messages(body, file);
 
-    if (!file->package().empty()) close_namespaces(body, file->package());
+    if (!package_name.empty()) close_namespaces(body, package_name);
 
     p.PrintRaw(body.str());
     return true;

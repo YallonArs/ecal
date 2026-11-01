@@ -1,10 +1,13 @@
 set(Protobuf_PROTOC_EXECUTABLE protoc)
-set(Protobuf_VERSION 3.11.4)
-set(Protobuf_VERSION_MAJOR 3)
-set(Protobuf_VERSION_MINOR 11)
-set(Protobuf_VERSION_PATCH 4)
+set(Protobuf_VERSION 36.2.0)
+set(Protobuf_VERSION_MAJOR 36)
+set(Protobuf_VERSION_MINOR 2)
+set(Protobuf_VERSION_PATCH 0)
 
 include_guard(GLOBAL)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(protobuf_BUILD_TESTS OFF CACHE BOOL "My option" FORCE)
 set(protobuf_MSVC_STATIC_RUNTIME OFF CACHE BOOL "My option" FORCE)
@@ -24,8 +27,8 @@ endif()
 
 ecal_disable_all_warnings()
 ecal_variable_push(CMAKE_POLICY_VERSION_MINIMUM)
-set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
-add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/protobuf/cmake" "${eCAL_BINARY_DIR}/thirdparty/protobuf" SYSTEM)
+set(CMAKE_POLICY_VERSION_MINIMUM 3.16)
+add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/protobuf" "${eCAL_BINARY_DIR}/thirdparty/protobuf" SYSTEM)
 ecal_variable_pop(CMAKE_POLICY_VERSION_MINIMUM)
 ecal_restore_warning_level()
 

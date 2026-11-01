@@ -22,6 +22,7 @@
 **/
 
 #include <ecal/msg/protobuf/ecal_proto_dyn.h>
+#include <ecal/msg/protobuf/ecal_proto_compat.h>
 
 #include <stdio.h>
 #include <iostream>
@@ -30,12 +31,12 @@
 
 #include <google/protobuf/stubs/common.h>
 
+#if GOOGLE_PROTOBUF_VERSION >= ECAL_PROTOBUF_REQUIRED_VERSION
+
 namespace eCAL
 {
 namespace protobuf
 {
-
-#if GOOGLE_PROTOBUF_VERSION >= 5026000
   class ParserErrorCollector : public google::protobuf::io::ErrorCollector
   {
   public:
@@ -114,86 +115,6 @@ namespace protobuf
 
     std::stringstream m_ss;
   };
-
-#else
-  class ParserErrorCollector : public google::protobuf::io::ErrorCollector
-  {
-  public:
-      ParserErrorCollector() = default;
-      ~ParserErrorCollector() override = default;
-
-    std::string Get() { return(m_ss.str()); }
-
-    // Indicates that there was an error in the input at the given line and
-    // column numbers.  The numbers are zero-based, so you may want to add
-    // 1 to each before printing them.
-    void AddError(int line_, int column_, const std::string& msg_) override
-    {
-      Add(line_, column_, "ERROR: " + msg_);
-    }
-
-    // Indicates that there was a warning in the input at the given line and
-    // column numbers.  The numbers are zero-based, so you may want to add
-    // 1 to each before printing them.
-    void AddWarning(int line_, int column_, const std::string& msg_) override
-    {
-      Add(line_, column_, "WARNING: " + msg_);
-    }
-
-  private:
-    void Add(int line_, int column_, const std::string& msg_)
-    {
-      m_ss << line_ << ":" << column_ << " " << msg_ << std::endl;
-    }
-
-    std::stringstream m_ss;
-  };
-
-  class DescriptorErrorCollector : public google::protobuf::DescriptorPool::ErrorCollector
-  {
-  public:
-    DescriptorErrorCollector() = default;
-    ~DescriptorErrorCollector() override = default;
-
-    std::string Get() { return(m_ss.str()); }
-
-    void AddError(
-      const std::string& filename,                    // File name in which the error occurred.
-      const std::string& element_name,                // Full name of the erroneous element.
-      const google::protobuf::Message* descriptor,    // Descriptor of the erroneous element.
-      ErrorLocation location,                         // One of the location constants, above.
-      const std::string& message                      // Human-readable error message.
-    ) override
-    {
-      Add(filename, element_name, descriptor, location, "ERROR: " + message);
-    }
-
-    void AddWarning(
-      const std::string& filename,                    // File name in which the error occurred.
-      const std::string& element_name,                // Full name of the erroneous element.
-      const google::protobuf::Message* descriptor,    // Descriptor of the erroneous element.
-      ErrorLocation location,                         // One of the location constants, above.
-      const std::string& message                      // Human-readable error message.
-    ) override
-    {
-      Add(filename, element_name, descriptor, location, "WARNING: " + message);
-    }
-
-  private:
-    void Add(
-      const std::string& filename,
-      const std::string& element_name,
-      const google::protobuf::Message* /*descriptor*/,
-      ErrorLocation location,
-      const std::string& message
-    )
-    {
-      m_ss << filename << " " << element_name << " " << location << " " << message << std::endl;
-    }
-
-    std::stringstream m_ss;
-  };
-#endif
 
   google::protobuf::Message* CProtoDynDecoder::GetProtoMessageFromFile(const std::string& proto_filename_, const std::string& msg_type_, std::string& error_s_)
   {
@@ -382,3 +303,5 @@ namespace protobuf
   }
 }
 }
+
+#endif
